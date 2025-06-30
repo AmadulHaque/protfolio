@@ -23,7 +23,7 @@ jobs:
         with:
           switches: -avz --delete
           path: ./  # Adjust this path to your build output directory if needed
-          remote_path: /var/www/html  # Replace with your server's path
+          remote_path: /var/www/test/protfolio  # Replace with your server's path
           remote_host: ${{ secrets.REMOTE_HOST }}
           remote_user: ${{ secrets.REMOTE_USER }}
           remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
