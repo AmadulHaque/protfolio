@@ -1,0 +1,39 @@
+name: Deploy static site to production server
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Optional: build step if needed (e.g., npm run build)
+      # - name: Build static files
+      #   run: npm install && npm run build
+
+      - name: Upload to production server via rsync
+        uses: burnett01/rsync-deployments@v2
+        with:
+          switches: -avz --delete
+          path: ./  # Adjust this path to your build output directory if needed
+          remote_path: /var/www/html  # Replace with your server's path
+          remote_host: ${{ secrets.REMOTE_HOST }}
+          remote_user: ${{ secrets.REMOTE_USER }}
+          remote_key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      # Optional: Restart web server or run post-deploy script
+      - name: SSH command (e.g., restart Nginx)
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo systemctl restart nginx
