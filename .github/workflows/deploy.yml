@@ -1,4 +1,4 @@
-name: Deploy to production server
+name: Simple Static Deploy to Production
 
 on:
   push:
@@ -9,36 +9,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Optional: Run something before deployment
-      - name: Pre-Deploy SSH Commands
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ variables.REMOTE_HOST }}
-          username: ${{ variables.REMOTE_USER }}
-          key: ${{ variables.SSH_PRIVATE_KEY }}
-          script: |
-            echo "Cleaning target folder..."
-            rm -rf /var/www/test/protfolio/*
-            mkdir -p /var/www/test/protfolio
-
-      - name: Deploy files to server
+      - name: Deploy index.html to server
         uses: easingthemes/ssh-deploy@main
         with:
           SSH_PRIVATE_KEY: ${{ variables.SSH_PRIVATE_KEY }}
-          ARGS: "-rlgoDzvc --delete"
-          SOURCE: "."  # or your build folder, like 'dist/' or 'public/'
           REMOTE_HOST: ${{ variables.REMOTE_HOST }}
           REMOTE_USER: ${{ variables.REMOTE_USER }}
-          TARGET: "/var/www/test/protfolio"
-
-      - name: Post-Deploy SSH Commands
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ variables.REMOTE_HOST }}
-          username: ${{ variables.REMOTE_USER }}
-          key: ${{ variables.SSH_PRIVATE_KEY }}
-          script: |
-            echo "Deployment finished."
+          TARGET: "/var/www/test/protfolio"          # Or your target path
+          SOURCE: "."                      # Root folder — uploads index.html
+          ARGS: "-avz --delete"            # Deletes files not in source
